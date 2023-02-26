@@ -38,7 +38,7 @@ speichern können. Die ausführbare Datei befindet sich im Unterordner 'bin'.
 Unter Umständen müssen Sie das zu verwendete JDK konfigurieren. Öffnen Sie 
 dazu die Datei 'etc/visualvm.conf' mit einem Texteditor und setzen Sie im 
 unteren Teil der Datei die Einstellung `visualvm_jdkhome` auf den Pfad zu 
-einem Ihrer installierten JDKs. Sie finden den entsprechendne Pfad zum 
+einem Ihrer installierten JDKs. Sie finden den entsprechenden Pfad zum 
 Beispiel in IntelliJ unter _File_ → _Project Structure_ und dann links unter 
 _SDKs_. Der erforderliche Pfad entspricht jenem im Feld _JDK home path_.
 
