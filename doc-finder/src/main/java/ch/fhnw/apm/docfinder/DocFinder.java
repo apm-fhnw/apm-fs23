@@ -6,8 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.synchronizedList;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static java.util.Objects.requireNonNull;
@@ -20,19 +24,40 @@ public class DocFinder {
     private long sizeLimit = 1_000_000_000; // 1 GB
     private boolean ignoreCase = true;
 
+    private final ExecutorService pool;
+
     public DocFinder(Path rootDir) {
+        this(rootDir, Runtime.getRuntime().availableProcessors());
+    }
+
+    public DocFinder(Path rootDir, int parallelism) {
         this.rootDir = requireNonNull(rootDir);
+        pool = Executors.newFixedThreadPool(parallelism, r -> {
+            var thread = new Thread(r);
+            thread.setDaemon(true);
+            return thread;
+        });
     }
 
     public List<Result> findDocs(String searchText) throws IOException {
         var allDocs = collectDocs();
 
-        var results = new ArrayList<Result>();
+        var results = synchronizedList(new ArrayList<Result>());
+
+        var tasks = new ArrayList<Callable<Void>>();
         for (var doc : allDocs) {
-            var res = findInDoc(searchText, doc);
-            if (res.totalHits() > 0) {
-                results.add(res);
-            }
+            tasks.add(() -> {
+                var res = findInDoc(searchText, doc);
+                if (res.totalHits() > 0) {
+                    results.add(res);
+                }
+                return null;
+            });
+        }
+        try {
+            pool.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            throw new AssertionError(e);
         }
 
         results.sort(comparing(Result::getRelevance, reverseOrder()));

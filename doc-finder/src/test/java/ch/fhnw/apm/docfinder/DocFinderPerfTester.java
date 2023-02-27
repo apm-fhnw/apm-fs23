@@ -7,7 +7,7 @@ import java.util.stream.DoubleStream;
 
 public class DocFinderPerfTester {
 
-    private static final int REPETITIONS = 30;
+    private static final int REPETITIONS = 100;
     public static final String SEARCH_TEXT = "woman friend cat";
 
     public static void main(String[] args) throws IOException {
@@ -18,7 +18,7 @@ public class DocFinderPerfTester {
             System.exit(1);
         }
 
-        var finder = new DocFinder(booksDir);
+        var finder = new DocFinder(booksDir, 16);
 
         var latencies = new double[REPETITIONS];
         for (int i = 0; i < REPETITIONS; i++) {
