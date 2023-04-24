@@ -1,0 +1,8 @@
+[
+	{
+	    "name" : "SuperCode",
+	    "methods" : [
+	    	      { "name" : "<init>", "parameterTypes" : [] }
+            ]
+        }
+]
